@@ -23,8 +23,6 @@ export default class BlogContainer {
         });
 
         form.parse(req, async (err, fields, files) => {
-            console.log(fields, files);
-
             if (err) {
                 return res.status(400).json({ message: 'Error parsing form data', err });
             }
@@ -105,56 +103,26 @@ export default class BlogContainer {
             const blogData = await BlogSchema.findById(req.params.id);
             if (!blogData)
                 return res.status(404).json({
-                    message: "Data is not available"
+                    message: "Blog does't exist"
                 })
             else {
                 const form = formidable();
                 // Object to store parsed fields
                 const parsedFields = {};
-                form.on('field', (name, value) => {
-                    parsedFields[name] = value;
-                });
-
+                form.on('field', (name, value) => parsedFields[name] = value);
                 form.parse(req, async (err, fields, files) => {
                     if (err) {
-                        return res.status(400).json({ message: 'Error parsing form data', err });
+                        return res.status(501).json({ message: `Unable to parse ${err}` });
                     }
-
-                    // Initialize variables for image information
-                    let image, imagePublicId, imageSecureUrl;
-                    if (files?.image?.[0]?.filepath) {
+                    if (files?.image) {
                         const result = await cloudinary.uploader.destroy(blogData.imagePublicId);
-                        // Upload new image to Cloudinary if an image file is provided
-                        image = await cloudinary.uploader.upload(files.image[0].filepath);
-                        parsedFields.image = image.url;
-                        imagePublicId = image.public_id;
-                        imageSecureUrl = image.secure_url;
+                        let imgData = await cloudinary.uploader.upload(files.image[0].filepath);
+
+                        parsedFields.imageUrl = imgData.url;
+                        parsedFields.public_id = imgData.public_id;
+                        parsedFields.imageSecureUrl = imgData.secure_url;
                     }
-
-                    // Create an update object with conditionally set fields
-                    const updateData = {
-                        user: parsedFields.user,
-                        title: parsedFields.title,
-                        description: parsedFields.description,
-                        content: parsedFields.content,
-                        ...(parsedFields.image && { imageUrl: parsedFields.image }),
-                        ...(imagePublicId && { imagePublicId }),
-                        ...(imageSecureUrl && { imageSecureUrl })
-                    };
-
-                    // Update the blog entry in the database
-                    const updatedBlog = await BlogSchema.findByIdAndUpdate(req.params.id, updateData,
-                        {
-                            new: true,
-                            runValidators: true
-                        });
-
-                    // Respond with the updated blog data
-                    return res.status(200).json({
-                        message: 'Blog updated successfully',
-                        blog: updatedBlog
-                    });
-
+                    return res.status(200).json(await BlogSchema.findByIdAndUpdate(req.params.id, parsedFields, { new: true }));
                 });
             }
         } catch (error) {
