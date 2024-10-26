@@ -5,6 +5,7 @@ import MainRouter from './router/mainRouter.js';
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 
+import MainRouter from './router/mainRouter.js'
 const app = express();
 app.use(express.json());
 

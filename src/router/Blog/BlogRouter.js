@@ -8,6 +8,6 @@ router.post('/addBlog', addBlog);
 router.get('/getBlogById/:id', getBlogById);
 router.get('/getAllBlog', getAllBlog);
 router.delete('/removeBlog/:id',removeBlog);
-router.put('/modifyBlog/:id',updateBlogId);
+router.patch('/modifyBlog/:id',updateBlogId);
 
 export default router;
