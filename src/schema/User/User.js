@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema(
   {
     userName: { type: String, required: true },
-    userEmail: { type: String, required: true },
+    userEmail: { type: String, required: true, unique:true },
     userPassword: { type: String, required: true },
     userRole: { type: String, default: "client" },
     pastProjects: [],
@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema(
     feedback: { type: String },
     Payment: {type: String,enum: ["pending", "Success", "fail", "half", "full"]},
     amount: { type: String },
+    profileId: {type: String},
+    profileSecure: {type: String},
+    token:{type:String}
   },
   { timestamps: true }
 );
