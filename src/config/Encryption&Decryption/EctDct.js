@@ -10,12 +10,17 @@ class EncryptDecrypt {
     return encrypted;
   };
 
-  decrypt = (encryptedText,key)=>{
-     const decipher = crypto.createDecipher(process.env.ALGO, key);
+  decrypt = (encryptedText, key) => {
+    const decipher = crypto.createDecipher(process.env.ALGO, key);
     let decrypted = decipher.update(encryptedText, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
-  }
+  };
+  
+  isValidPassword = (password) => {
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    return regex.test(password);
+  };
 }
 
 export default new EncryptDecrypt();

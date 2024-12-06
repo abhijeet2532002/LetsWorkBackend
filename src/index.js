@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import DB from './config/DB_Config/MongoDBConfig.js';
 import MainRouter from './router/mainRouter.js';
 import cloudinaryConfig from './config/Cloudinary/cloudinary.js';
+import { LocalStorage } from "node-localstorage";
+const localStorage = new LocalStorage("./scratch");
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;

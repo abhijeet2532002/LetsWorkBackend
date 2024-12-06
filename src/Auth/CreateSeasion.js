@@ -25,7 +25,9 @@ class CreateSession {
         await User.findByIdAndUpdate(user._id, { token });
         return res.status(200).json(token);
       }
-      return res.status(400).json({Message:'Your Current Session Running, Logout First'});
+      return res
+        .status(400)
+        .json({ Message: "Your Current Session Running, Logout First" });
     } catch (err) {
       return res.json({ Error: err });
     }
@@ -33,10 +35,13 @@ class CreateSession {
 
   logout = async (req, res) => {
     try {
-      const token = req.header("Authorization");
-      const user = await User.findOne({ token });
-      await User.findByIdAndUpdate(user._id, { token: null }, { new: true });
-      return res.json({ Message: `Session closed with id ${user._id}` });
+      return res.json(
+        (await User.findOneAndUpdate(
+          { token: req.header("Authorization") },
+          { token: null },
+          { new: true }
+        ))
+      );
     } catch (err) {
       return res.status(400).json(err);
     }
