@@ -8,7 +8,7 @@ const projectSchema = new mongoose.Schema({
   endDate: { type: Date, required: true },
   projectUrl: { type: String },
   projectGithub: { type: String },
-  user: { type: String, required: true },
+  userEmail: { type: String, required: true },
   teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   price: { type: String },
   payment: {type: String,enum: ["pending", "success", "fail", "half", "full"]},
