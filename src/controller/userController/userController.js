@@ -1,5 +1,4 @@
 import User from "../../schema/User/User.js";
-import formidable from "formidable";
 import { v2 as cloudinary } from "cloudinary";
 import requestBody from "../../config/formData/formData.js";
 import EctDct from "../../config/Encryption&Decryption/EctDct.js";
@@ -11,10 +10,11 @@ dotenv.config();
 const { encrypt, isValidPassword } = EctDct;
 const { sendMail } = Mail;
 const localStorage = new LocalStorage("./scratch");
+
 class userController {
   // for the register user
   userSignUp = async (req, res) => {
-    const { fields, files } = await requestBody(req);
+    const fields = req.body;
     if (!isValidPassword(fields.userPassword)) {
       return res.status(400).json({
         error:
@@ -23,9 +23,6 @@ class userController {
     }
     fields.userPassword = encrypt(fields.userPassword, process.env.KEY);
     try {
-      if (files.profile) {
-        fields.profile = files.profile;
-      }
       const randomNumber = Math.floor(100000 + Math.random() * 900000);
       fields.OTP = randomNumber;
       fields.time = new Date().getMinutes();
@@ -50,22 +47,22 @@ class userController {
     const user = JSON.parse(user1);
     const date = new Date();
     let current = date.getMinutes();
+    user.profileId = req.body.public_id;
+    user.profileSecure = req.body.secure_url;
+    user.profile = req.body.url;
     if (Math.abs(current - user.time) <= 5) {
-      if (user.profile) {
-        const img = await cloudinary.uploader.upload(files.profile[0].filepath);
-        user.profileId = img.public_id;
-        user.profileSecure = img.secure_url;
-        user.profile = img.url;
-      }
-
       if (user.OTP == OTP) {
         delete user.OTP;
+        const exist = await User.findOne({ userEmail: user.userEmail });
+        if (exist) {
+          return res.status(501).json({ error: "Email Alredy Taken" });
+        }
         const userData = await User.create(user);
         return res.json({ Varify: "Account Varified", Message: userData });
       }
-      return res.json({ Messgae: "OTP did't Matched" });
+      return res.status(500).json({ error: "OTP did't Matched" });
     } else {
-      return res.json({ Message: "Sorry OTP Expires" });
+      return res.status(403).json({ error: "OTP Expired" });
     }
   };
 
@@ -90,11 +87,21 @@ class userController {
     }
   };
 
-  fetchUser = async (req, res) => {};
+  fetchUser = async (req, res) => {
+    try{
+         const user = await User.findById(req.params.id);
+         if(!user){return res.status(404).json({error:'User not found'})}
+         return res.status(200).json(user);
+    }catch(err){
+      return res.status(500).json(err)
+    }
+  };
 
   deleteUser = async (req, res) => {};
 
   updateUser = async (req, res) => {};
+
+  //
 }
 
 export default new userController();

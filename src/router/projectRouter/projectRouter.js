@@ -1,13 +1,14 @@
 import express from 'express';
 import projectController from '../../controller/projectController/projectController.js';
-const {addProject,deleteProject,getAllProject,singleProject,updateProject} = projectController;
+const {addProject,deleteProject,getAllProject,singleProject,updateProject,updateWizard} = projectController;
 
 const router = express.Router();
 router.post('/add/data',addProject);
 router.get('/getAll/data',getAllProject);
-router.delete('/delete/data',deleteProject);
+router.delete('/delete/data/:id',deleteProject);
 router.get('/fetch/data/:id',singleProject);
-router.patch('/update/:id',updateProject);
+router.put('/update/:id',updateProject);
+router.post('/wizard/update/:id',updateWizard);
 
 export default router;
 

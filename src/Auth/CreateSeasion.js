@@ -23,7 +23,7 @@ class CreateSession {
           expiresIn: 10000,
         });
         await User.findByIdAndUpdate(user._id, { token });
-        return res.status(200).json(token);
+        return res.status(200).json({token});
       }
       return res
         .status(400)

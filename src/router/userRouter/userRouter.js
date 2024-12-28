@@ -12,8 +12,9 @@ const {
 } = user;
 const router = express();
 router.post("/api/register/data", userSignUp);
-router.get("/api/all/data", verifyToken,fetchAlluser);
-router.post('/api/user/otp/varify',varifyOTP);
+router.get("/api/all/data", verifyToken, fetchAlluser);
+router.post("/api/user/otp/varify", varifyOTP);
 router.get("/api/user/otp/resend", resendOTP);
+router.get("/api/user/fetch/:id", verifyToken, fetchUser);
 
 export default router;

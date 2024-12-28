@@ -19,7 +19,12 @@ const userSchema = new mongoose.Schema(
     amount: { type: String },
     profileId: {type: String},
     profileSecure: {type: String},
-    token:{type:String}
+    token:{type:String},
+    userBio:{type:String},
+    fb:{type:String},
+    twitter:{type:String},
+    linkedIn:{type:String},
+    department:{type:String}
   },
   { timestamps: true }
 );
