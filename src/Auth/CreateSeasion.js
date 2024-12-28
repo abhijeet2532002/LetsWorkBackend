@@ -23,7 +23,7 @@ class CreateSession {
           expiresIn: 10000000,
         });
         await User.findByIdAndUpdate(user._id, { token });
-        return res.status(200).json({token});
+        return res.status(200).json({ token });
       }
       return res
         .status(400)
@@ -36,11 +36,11 @@ class CreateSession {
   logout = async (req, res) => {
     try {
       return res.json(
-        (await User.findOneAndUpdate(
+        await User.findOneAndUpdate(
           { token: req.header("Authorization") },
           { token: null },
           { new: true }
-        ))
+        )
       );
     } catch (err) {
       return res.status(400).json(err);
