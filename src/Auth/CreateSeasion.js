@@ -20,7 +20,7 @@ class CreateSession {
       }
       if (!user.token) {
         const token = JwtToken.sign(user.toJSON(), process.env.JWT_KEY, {
-          expiresIn: 10000,
+          expiresIn: 10000000,
         });
         await User.findByIdAndUpdate(user._id, { token });
         return res.status(200).json({token});
