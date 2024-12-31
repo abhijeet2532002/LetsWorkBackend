@@ -3,6 +3,8 @@ import User from "../../schema/User/User.js";
 
 class projectController {
   addProject = async (req, res) => {
+    console.log(req.body);
+    
     const { userEmail } = req.body;
     try {
       const client = await User.findOne({ userEmail });
@@ -15,6 +17,8 @@ class projectController {
       const projectModel = await Project.create(req.body);
       projectModel.teams.push(...team.map((admin) => admin._id));
       projectModel.save();
+      client.currentProjects.push(projectModel);
+      client.save();
       return res.status(200).json(projectModel);
     } catch (err) {
       return res.status(500).json(err);
@@ -70,10 +74,22 @@ class projectController {
 
   updateWizard = async (req, res) => {
     try {
-      console.log("hello");
       let project = await Project.findById(req.params.id);
-      project.wizard = {...project.wizard,...req.body}
-      project.save();
+      project.wizard = { ...project.wizard, ...req.body };
+
+      if (req.body.maintains === "done") {
+        const user = await User.findOne({ userEmail: project.userEmail });
+        if (user) {
+          user.currentProjects = user.currentProjects.filter(
+            (projId) => projId.toString() !== project._id.toString()
+          );
+          if (!user.pastProjects.includes(project._id)) {
+            user.pastProjects.push(project._id);
+          }
+          await user.save();
+        }
+      }
+      await project.save();
       return res.status(200).json(project);
     } catch (err) {
       return res.status(500).json(err);
